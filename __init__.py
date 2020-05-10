@@ -1,12 +1,12 @@
 bl_info = {
-    "name": "Import POTCO WorldData",
+    "name": "POTCO Blender Tools",
     "author": "Bart Gunshot",
-    "version": (0, 1),
+    "version": (0, 2),
     "blender": (2, 80, 0),
-    "location": "File > Import > POTCO WorldData",
-    "description": "Rudimentary importing for POTCO worlddata. Does not preserve all data. Do not expect to export.",
-    "warning": "Early development. ONLY IMPORT ON AN EMPTY FILE",
-    "category": "Import",
+    "location": "",
+    "description": "Various tooling for working with POTCO model files.",
+    "warning": "Early development. Use with caution",
+    "category": "General",
 }
 
 import bpy
