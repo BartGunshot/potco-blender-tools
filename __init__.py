@@ -41,6 +41,8 @@ class IMPORT_OT_worlddata(bpy.types.Operator, ImportHelper):
     except AttributeError:
         load_egg = False
         print("blender-egg-importer not installed.")
+    
+    load_egg = True
 
     # This runs after files are selected and opened
     def execute(self, context):
@@ -62,44 +64,57 @@ class IMPORT_OT_worlddata(bpy.types.Operator, ImportHelper):
                             IterateWorldData(data.objectStruct)
                 
                 # Load models into blender 
-                if self.load_egg and obj.get('Visual'):
-                    # Setup some variables to store parts of the path
-                    modelpath = ""
-                    dis_model_path = str(obj['Visual']['Model']).split("/")
-                    modelname = dis_model_path[-1] 
-                    
-                    # The disney model path is stored badly, fix this. 
-                    for part in dis_model_path[:-1]:
-                        modelpath = os.path.join(modelpath, part)
-                    
-                    # Setup the variables to pass to the egg importer
-                    fp = os.path.join(self.directory, modelpath, modelname,".egg")
-                    direct = os.path.join(self.directory, modelpath)
-                    fs=[{"name":modelname+ ".egg", "name":modelname + ".egg"}]
-                    
-                    # run egg importer on current model
-                    bpy.ops.import_scene.egg(filepath=fp, directory=direct, files=fs)
-                    
-                    # get list of objects at top level in the scene:
-                    rootobs = (o for o in bpy.context.scene.objects if not o.parent)
-                    for o in rootobs:
-                        # Check list of previous objects to get only most recently added
-                        if o not in last_rootobs:
-                            # Apply the transformations
-                            if obj.get('Pos'):
-                                o.location[0] = obj['Pos'].x
-                                o.location[1] = obj['Pos'].y
-                                o.location[2] = obj['Pos'].z
-                            if obj.get('Scale'):
-                                o.scale[0] = obj['Scale'].x
-                                o.scale[1] = obj['Scale'].y
-                                o.scale[2] = obj['Scale'].z
-                            if obj.get('Hpr'):
-                                o.rotation_euler[0] = obj['Hpr'].x
-                                o.rotation_euler[1] = obj['Hpr'].y
-                                o.rotation_euler[2] = obj['Hpr'].z
-                        # add this object to previous objects to prevent additional transformations
-                        last_rootobs.append(o)
+                try:
+                    if self.load_egg and obj.get('Visual'):
+                        # Setup some variables to store parts of the path
+                        modelpath = ""
+                        dis_model_path = str(obj['Visual']['Model']).split("/")
+                        modelname = dis_model_path[-1] 
+                        
+                        # The disney model path is stored badly, fix this. 
+                        for part in dis_model_path[:-1]:
+                            modelpath = os.path.join(modelpath, part)
+                        
+                        # Setup the variables to pass to the egg importer
+                        fp = os.path.join(self.directory, modelpath, modelname + ".egg")
+                        dr = os.path.join(self.directory, modelpath)
+                        fs=[{"name":modelname+ ".egg", "name":modelname + ".egg"}]
+                        
+                        # Search for file in phase_2-5
+                        phase = 2
+                        while (not os.path.isfile(fp) and phase < 6):
+                            fp = os.path.join(self.directory, "phase_" + str(phase), modelpath, modelname + ".egg")
+                            dr =  os.path.join(self.directory, "phase_" + str(phase), modelpath)
+                            phase += 1
+                        
+                        # run egg importer on current model
+                        bpy.ops.import_scene.egg(filepath=fp, directory=dr, files=fs)
+                        
+                        # get list of objects at top level in the scene:
+                        rootobs = (o for o in bpy.context.scene.objects if not o.parent)
+                        for o in rootobs:
+                            # Check list of previous objects to get only most recently added
+                            if o not in last_rootobs:
+                                # Apply the transformations
+                                if obj.get('Pos'):
+                                    o.location[0] = obj['Pos'].x
+                                    o.location[1] = obj['Pos'].y
+                                    o.location[2] = obj['Pos'].z
+                                if obj.get('Scale'):
+                                    o.scale[0] = obj['Scale'].x
+                                    o.scale[1] = obj['Scale'].y
+                                    o.scale[2] = obj['Scale'].z
+                                if obj.get('Hpr'):
+                                    pi = 22.0/7.0
+                                    o.rotation_euler[0] = (obj['Hpr'].z / 360) * (2 * pi)
+                                    o.rotation_euler[1] = (obj['Hpr'].y / 360) * (2 * pi)
+                                    o.rotation_euler[2] = (obj['Hpr'].x / 360) * (2 * pi)
+                            # add this object to previous objects to prevent additional transformations
+                            last_rootobs.append(o)
+                except KeyError:
+                    pass
+                except:
+                    pass
 
         for file in self.files:
             path = os.path.join(self.directory, file.name)
