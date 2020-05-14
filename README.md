@@ -9,7 +9,13 @@ This addon adds in a rudimentary WorldData importer for POTCO WorldData files. T
 The worldData files are found in any src rip of POTCO. I recommend this one for this instance:
 https://github.com/PiratesOnlineRewritten/Pirates-Online-Rewritten/tree/master/pirates/leveleditor/worldData
 
-#### Problems
-- Slow and clunky. I wouldn't attempt to import any of the larger WorldData files, but it will work given enough time.
-- Doesn't preserve object hierarchy. 
-- Relies on the blender egg importer. 
+#### Issues:
+- Caves don't load properly
+- The larger worlddata files take a very long time to import
+
+#### TODO:
+- Write a proper parser for reading worlddata
+- Preserve object properties 
+- Preserve object hierarchy
+- Support links
+- Performance improvements
