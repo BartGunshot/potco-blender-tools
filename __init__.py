@@ -62,7 +62,7 @@ class IMPORT_OT_worlddata(bpy.types.Operator, ImportHelper):
                             IterateWorldData(data.objectStruct)
                 
                 # Load models into blender 
-                if self.load_egg and obj.get('Visual'):
+                if self.load_egg and obj.get('Visual') and obj.get('Visual').get('Model'):
                     # Setup some variables to store parts of the path
                     modelpath = ""
                     dis_model_path = str(obj['Visual']['Model']).split("/")
